@@ -4,3 +4,7 @@ script 3: Write a script that changes the working directory to the user’s home
 You are not allowed to use any shell variables
 script 4: Display current directory contents in a long format.
 script 5: Display current directory contents, including hidden files (starting with .). Use the long format.
+script 6: Display current directory contents.
+Long format
+with user and group IDs displayed numerically
+And hidden files (starting with .)
