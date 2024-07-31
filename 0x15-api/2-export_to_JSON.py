@@ -1,29 +1,34 @@
 #!/usr/bin/python3
-"""Exports data in the JSON format"""
+"""
+A Python script that, using this REST API, for a given employee ID,
+returns information about his/her TODO list progress and
+export data in the JSON format.
+"""
 
-if __name__ == "__main__":
+import json
+import requests
+from sys import argv
 
-    import json
-    import requests
-    import sys
 
-    userId = sys.argv[1]
-    user = requests.get("https://jsonplaceholder.typicode.com/users/{}"
-                        .format(userId))
-    todos = requests.get('https://jsonplaceholder.typicode.com/todos')
-    todos = todos.json()
+if __name__ == '__main__':
+    eid = argv[1]
+    userUrl = "https://jsonplaceholder.typicode.com/users"
+    url = userUrl + "/" + eid
 
-    todoUser = {}
-    taskList = []
+    response = requests.get(url)
+    uname = response.json().get('username')
 
-    for task in todos:
-        if task.get('userId') == int(userId):
-            taskDict = {"task": task.get('title'),
-                        "completed": task.get('completed'),
-                        "username": user.json().get('username')}
-            taskList.append(taskDict)
-    todoUser[userId] = taskList
+    todoUrl = url + "/todos"
+    response = requests.get(todoUrl)
+    tasks = response.json()
 
-    filename = userId + '.json'
-    with open(filename, mode='w') as f:
-        json.dump(todoUser, f)
+    dic = {eid: []}
+    for task in tasks:
+        dic[eid].append({
+            "task": task.get('title'),
+            "completed": task.get('completed'),
+            "username": uname
+        })
+
+    with open('{}.json'.format(eid), 'w') as f:
+        json.dump(dic, f)
