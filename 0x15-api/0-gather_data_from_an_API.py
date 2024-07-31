@@ -1,43 +1,26 @@
 #!/usr/bin/python3
-"""A simple module to make API Calls
-To a mockup API server and return the
-Responses. Then print them out to standard output
-Usage: ./0-gather-data_from_an_API <ID>
-Where <ID> is the employee ID for whom we want to list
-The tasks"""
+"""Gather data from an API"""
 
-from requests import get
-from sys import argv
-
-headers = {
-    "Content-Type": "application/json",
-    "Accept": "application/json",
-    "User-Agent": "Thing Gecko/20100101 Firefox/102.0"
-}
-base_url = "https://jsonplaceholder.typicode.com/users/"
-
-
-def get_task_status(user_id: str) -> None:
-    """
-    Get the task status for a certain user
-    Args:
-        user_id (str): The user id of the user
-    """
-    # lets first get the name of Employee
-    emp_name = get("{}{}".format(base_url, user_id)).json().get("name")
-    full_url = "{}{}/todos/".format(base_url, user_id)
-    response = get(full_url, headers=headers).json()
-    # lets get the total number of tasks shall we?
-    total_tasks = len(response)
-
-    # How about done tasks
-    done_tasks = [task['title'] for task in response
-                  if task['completed']]
-    done_tasks_count = len(done_tasks)
-    print("Employee {} is done with tasks({}/{}):".format(
-        emp_name, done_tasks_count, total_tasks))
-    [print("\t {}".format(task)) for task in done_tasks]
+import requests
+import sys
 
 
 if __name__ == "__main__":
-    get_task_status(argv[1])
+    # Define the URL for the REST API
+    url = "https://jsonplaceholder.typicode.com/"
+
+    # send a GET request to retrieve user info
+    user = requests.get(url + "users/{}".format(sys.argv[1])).json()
+
+    # send a GET request to retrive the TODO list
+    todos = requests.get(url + "todos", params={"userId": sys.argv[1]}).json()
+
+    # filter completed TODO list and store titles in a list
+    completed = [t.get("title") for t in todos if t.get("completed") is True]
+
+    # print employee's name, completed tasks & total no of tasks
+    print("Employee {} is done with tasks({}/{}):".format(
+        user.get("name"), len(completed), len(todos)))
+
+    # print the titles of completed tasks with indentation
+    [print("\t {}".format(c)) for c in completed]
