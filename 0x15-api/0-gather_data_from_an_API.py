@@ -1,26 +1,59 @@
 #!/usr/bin/python3
-"""Gather data from an API"""
-
+"""script that fetches info about a given employee's ID using an api"""
+import json
 import requests
 import sys
 
 
+base_url = 'https://jsonplaceholder.typicode.com'
+
 if __name__ == "__main__":
-    # Define the URL for the REST API
-    url = "https://jsonplaceholder.typicode.com/"
 
-    # send a GET request to retrieve user info
-    user = requests.get(url + "users/{}".format(sys.argv[1])).json()
+    user_id = sys.argv[1]
 
-    # send a GET request to retrive the TODO list
-    todos = requests.get(url + "todos", params={"userId": sys.argv[1]}).json()
+    # get user info e.g https://jsonplaceholder.typicode.com/users/1/
+    user_url = '{}/users?id={}'.format(base_url, user_id)
+    # print("user url is: {}".format(user_url))
 
-    # filter completed TODO list and store titles in a list
-    completed = [t.get("title") for t in todos if t.get("completed") is True]
+    # get info from api
+    response = requests.get(user_url)
+    # pull data from api
+    data = response.text
+    # parse the data into JSON format
+    data = json.loads(data)
+    # extract user data, in this case, name of employee
+    name = data[0].get('name')
+    # print("id is: {}".format(user_id))
+    # print("name is: {}".format(name))
 
-    # print employee's name, completed tasks & total no of tasks
-    print("Employee {} is done with tasks({}/{}):".format(
-        user.get("name"), len(completed), len(todos)))
+    # get user info about todo tasks
+    # e.g https://jsonplaceholder.typicode.com/users/1/todos
+    tasks_url = '{}/todos?userId={}'.format(base_url, user_id)
+    # print("tasks url is: {}".format(tasks_url))
 
-    # print the titles of completed tasks with indentation
-    [print("\t {}".format(c)) for c in completed]
+    # get info from api
+    response = requests.get(tasks_url)
+    # pull data from api
+    tasks = response.text
+    # parse the data into JSON format
+    tasks = json.loads(tasks)
+
+    # initialize completed count as 0 and find total number of tasks
+    completed = 0
+    total_tasks = len(tasks)
+
+    # initialize empty list for completed tasks
+    completed_tasks = []
+    # loop through tasks counting number of completed tasks
+    for task in tasks:
+
+        if task.get('completed'):
+            # print("The tasks are: {}\n".format(task))
+            completed_tasks.append(task)
+            completed += 1
+
+    # print the output in the required format
+    print("Employee {} is done with tasks({}/{}):"
+          .format(name, completed, total_tasks))
+    for task in completed_tasks:
+        print("\t {}".format(task.get('title')))
