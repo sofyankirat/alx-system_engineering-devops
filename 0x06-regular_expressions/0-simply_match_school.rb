@@ -1,3 +1,2 @@
-#!/usr/bin/env bash
-#Bash script that displays its own PID.
-echo "$$"
+#!/usr/bin/env ruby
+puts ARGV[0].scan(/Scho*l/).join
