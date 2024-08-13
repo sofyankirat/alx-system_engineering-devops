@@ -1,23 +1,25 @@
 #!/usr/bin/python3
-"""
-Queries the Reddit API and prints the titles of the first 10 hot posts listed
-for a given subreddit.
-"""
+"""Script that returns no. of subscribers of a subreddit"""
 import requests
 
 
-def top_ten(subreddit):
-    """
-    Queries the Reddit API and prints the titles of the first 10 hot posts
-    listed for a given subreddit.
-    """
-    url = 'https://www.reddit.com/r/{}/hot.json?show="all"&limit=10'.format(
-        subreddit)
-    headers = {'User-Agent': 'Python/1.0(Holberton School 0x16)'}
-    response = requests.get(url, headers=headers)
+def number_of_subscribers(subreddit):
+    """Function that returns no. of subs of a subreddit"""
+    if subreddit is None or not isinstance(subreddit, str):
+        return 0
+
+    headers = {'User-Agent': 'selBot/1.0'}
+    URL = f'https://www.reddit.com/r/{subreddit}/about.json'
+
     try:
-        top_ten = response.json()['data']['children']
-        for post in top_ten:
-            print(post['data']['title'])
-    except KeyError:
-        print("None")
+        response = requests.get(URL, headers=headers, allow_redirects=False)
+        response.raise_for_status()
+        data = response.json()
+        subscribers = data['data']['subscribers']
+        return subscribers
+
+    except requests.exceptions.RequestException:
+        return 0
+
+    except (KeyError, ValueError):
+        return 0
