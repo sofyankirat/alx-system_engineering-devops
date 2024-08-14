@@ -1,18 +1,15 @@
 #!/usr/bin/python3
-"""Function to query subscribers on a given Reddit subreddit."""
-
+"""Module listing the title of top 10 hot post in the subreddit"""
 import requests
-import sys
 
 
-def number_of_subscribers(subreddit):
-    """Return the total number of subscribers on a given subreddit."""
-    url = "https://www.reddit.com/r/{}/about.json".format(subreddit)
-    headers = {
-        "User-Agent": "linux:0x16.api.advanced:v1.0.0 (by /u/bdov_)"
-    }
-    response = requests.get(url, headers=headers, allow_redirects=False)
+def top_ten(subreddit):
+    """list the title of top 10 hot post in the subreddit"""
+    url = f'https://www.reddit.com/r/{subreddit}/hot.json?limit=10'
+    user = {'User-Agent': 'Test123'}
+    response = requests.get(url, headers=user, allow_redirects=False)
     if response.status_code == 404:
-        return 0
-    results = response.json().get("data")
-    return results.get("subscribers")
+        print('None')
+        return
+    for post in response.json().get('data').get('children'):
+        print(post.get('data').get('title'))
