@@ -1,20 +1,21 @@
 #!/usr/bin/python3
-"""Define number_of_subscribers function"""
+"""Function to print hot posts on a given Reddit subreddit."""
 import requests
 
 
-def number_of_subscribers(subreddit):
-    """Query the Reddit API and returns the number of subscribers
-    (not active users, total subscribers) for a given subreddit.
-    - If an invalid subreddit is given, the function should return 0.
-    """
-    url = "https://www.reddit.com/r/{}/about.json".format(subreddit)
+def top_ten(subreddit):
+    """Print the titles of the 10 hottest posts on a given subreddit."""
+    url = "https://www.reddit.com/r/{}/hot/.json".format(subreddit)
     headers = {
-        "User-Agent": "linux:0x016.project:v1.0.0 (by /u/ecalvoc)"
-        }
-    subreddit_data = requests.get(url,
-                                  headers=headers,
-                                  allow_redirects=False).json().get("data")
-    if subreddit_data:
-        return subreddit_data.get("subscribers")
-    return 0
+        "User-Agent": "linux:0x16.api.advanced:v1.0.0"
+    }
+    params = {
+        "limit": 10
+    }
+    response = requests.get(url, headers=headers, params=params,
+                            allow_redirects=False)
+    if response.status_code == 404:
+        print("None")
+        return
+    results = response.json().get("data")
+    [print(c.get("data").get("title")) for c in results.get("children")]
